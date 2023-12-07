@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        #image-preview {
+            position: absolute;
+            top: 20vh;
+            left: 10vw;
+            zoom: 1;
+            z-index: 2;
+        }
+
+        #image-preview img {
+            width: 45%;
+        }
+
+        canvas {
+            position: absolute;
+            top: 5vh;
+            right: 15vw;
+            width: 40% !important;
+            height: 90% !important;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+</head>
+
+<body>
+    <div id="container">
+        <div id="image-preview"></div>
+        <div id="canvas-container">
+            <script type="text/javascript">
+                let img, audio, canvasDistort;
+                let imgSrc = "REN_XYE.jpg";
+                let imgW, imgH;
+                let pixelIncrement = 15;
+                let angle = 1;
+                let fft;
+
+                function addPreview() {
+                    let imgPreview = new Image();
+                    imgPreview.src = imgSrc;
+                    document.getElementById("image-preview").appendChild(imgPreview);
+                }
+
+                function preload() {
+                    img = loadImage(imgSrc);
+                    addPreview();
+                }
+
+                function setup() {
+                    imgW = 1080;
+                    imgH = 1440;
+                    canvasDistort = createCanvas(imgW, imgH);
+
+                    audio = new p5.AudioIn();
+                    audio.start();
+                    audio.amp(2);
+
+                    fft = new p5.FFT();
+                    fft.setInput(audio);
+                }
+
+                function draw() {
+                    let spectrum = fft.analyze();
+                    let bass, treble, lowMid;
+
+                    bass = Math.floor(fft.getEnergy("bass", [0, 200]));
+                    treble = Math.floor(fft.getEnergy("treble", [0, 200]));
+                    lowMid = Math.floor(fft.getEnergy("lowMid", [0, 200]));
+
+                    let bins = [bass, treble, lowMid];
+                    let BTL = bass + treble + lowMid;
+
+                    console.log(bins);
+
+                    if (bins[1] <= 0) {
+                        angle = 0;
+                    } else if (bins[1] >= 50) {
+                        angle = random(bins[1] + 120);
+                    } else {
+                        angle = bins[0];
+                    }
+
+                    // Clear the canvas
+                    background(0);
+
+                    for (let cols = 0; cols < img.width; cols += pixelIncrement) {
+                        for (let rows = 0; rows < img.height; rows += pixelIncrement) {
+                            let xPos = cols,
+                                yPos = rows;
+                            let pixelColor = img.get(xPos, yPos);
+
+                            push();
+                            translate(xPos, yPos);
+                            noFill();
+                            rotate(radians(angle));
+                            stroke(color(pixelColor));
+                            strokeWeight(random(1));
+                            point(0, 0);
+                            strokeWeight(random(3));
+                            curve(
+                                0,
+                                0,
+                                sin(0) * random(60),
+                                cos(0) * sin(0) * random(90),
+                                random(10),
+                                random(80),
+                                cos(0) * sin(0) * random(140),
+                                cos(0) * sin(0) * 50
+                            );
+                            pop();
+                        }
+                    }
+                }
+            </script>
+        </div>
+    </div>
+</body>
+</html>
