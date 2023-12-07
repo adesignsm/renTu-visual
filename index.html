@@ -69,6 +69,10 @@
                     fft.setInput(audio);
                 }
 
+                function mousePressed() {
+                    userStartAudio();
+                }
+
                 function draw() {
                     let spectrum = fft.analyze();
                     let bass, treble, lowMid;
