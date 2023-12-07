@@ -21,6 +21,20 @@
             width: 40%;
         }
 
+        #hexstudio-logo {
+            width: 10%;
+            position: absolute;
+            top: 75vh;
+            left: 15vw;
+        }
+
+        #bct-logo {
+            position: absolute;
+            width: 10%;
+            top: 70vh;
+            left: 1vw;
+        }
+
         canvas {
             position: absolute;
             top: 5vh;
@@ -36,6 +50,8 @@
 <body>
     <div id="container">
         <div id="image-preview"></div>
+        <img id="bct-logo" src="bct.png"/>
+        <img id="hexstudio-logo" src="hex.jpg"/>
         <div id="canvas-container">
             <script type="text/javascript">
                 let img, audio, canvasDistort;
